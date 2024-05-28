@@ -28,16 +28,22 @@ const App = () => {
         }
     }
 
+    const getMail = async () => {
+        const response = await fetch('http://localhost:8080/get_mail');
+        const data = await response.text();
+        console.log(data);
+    }
+
     return (
         <div className="bg-slate-800">
-            <div className="ml-4">
+            <div className="ml-4 text-center">
                 <h1 className="text-4xl font-semibold text-center text-white">
                     Client Mail
                 </h1>
                 <p className="text-slate-400 py-5 ml-4 ">
                     Connecté en tant que projetrustsender@outlook.com
                 </p>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="justify-center">
                     <div className="form-element">
                         <label className="text-white">Destinataire:</label>
                         <input
@@ -69,6 +75,9 @@ const App = () => {
                     </div>
                     <button className="border-rounded border-slate-400 bg-blue-500 mx-6 my-6 px-2 py-0" type="submit">
                         Envoyer
+                    </button>
+                    <button onClick={getMail} className="border-rounded border-slate-400 bg-green-700 mx-6 my-6 px-2 py-0">
+                        Récuperer le mail
                     </button>
                 </form>
                 {response && <p>{response}</p>}
