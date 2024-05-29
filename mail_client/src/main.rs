@@ -15,6 +15,13 @@ struct EmailRequest {
     message: String,
 }
 
+#[get("/get_email_address")]
+async fn get_email_address() -> impl Responder {
+    dotenv().ok();
+    let email_address = env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set");
+    HttpResponse::Ok().body(email_address)
+}
+
 #[post("/send_email")]
 async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
     dotenv().ok();
@@ -70,6 +77,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .service(send_email)
+            .service(get_email_address)
             .service(get_mail)
     })
     .bind(("127.0.0.1", 8080))?
