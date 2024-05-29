@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "start": "concurrently \"cd mail_client && cargo run\" \"cd frontend && npm run dev\""
+    },
+    "devDependencies": {
+        "concurrently": "^5.3.0"}
+}
