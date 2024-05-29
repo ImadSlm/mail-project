@@ -1,45 +1,21 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'mail_client'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=mail_client",
-                    "--package=mail_client"
-                ],
-                "filter": {
-                    "name": "mail_client",
-                    "kind": "bin"
-                }
-            },
+            "name": "Debug Actix-Web App",
+            "program": "${workspaceFolder}/target/debug/mail_client",
             "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'mail_client'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=mail_client",
-                    "--package=mail_client"
-                ],
-                "filter": {
-                    "name": "mail_client",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "sourceLanguages": ["rust"],
+            "preLaunchTask": "cargo build",
+            "env": {
+                "RUST_LOG": "debug",
+                "EMAIL_ADDRESS": "projetrustsender@outlook.com",
+                "EMAIL_PASSWORD": "azerty123",
+            }
         }
     ]
 }

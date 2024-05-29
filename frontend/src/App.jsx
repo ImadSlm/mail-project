@@ -7,6 +7,7 @@ const App = () => {
     const [message, setMessage] = useState("msgtest")
     const [response, setResponse] = useState("")
     const [error, setError] = useState("")
+    const [mailData, setMailData] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -32,6 +33,7 @@ const App = () => {
         const response = await fetch('http://localhost:8080/get_mail');
         const data = await response.text();
         console.log(data);
+        setMailData(data);
     }
 
     return (
@@ -73,13 +75,14 @@ const App = () => {
                             required
                         />
                     </div>
-                    <button className="border-rounded border-slate-400 bg-blue-500 mx-6 my-6 px-2 py-0" type="submit">
+                    <button className="border-rounded border-slate-400 text-slate-200 bg-blue-500 hover:bg-blue-600 mx-6 my-6 px-2 py-0" type="submit">
                         Envoyer
                     </button>
-                    <button onClick={getMail} className="border-rounded border-slate-400 bg-green-700 mx-6 my-6 px-2 py-0">
+                    <button onClick={getMail} className="border-rounded border-slate-400 text-slate-200 bg-green-700 mx-6 hover:bg-green-800 my-6 px-2 py-0">
                         Récuperer le mail
                     </button>
                 </form>
+                <p>{mailData}</p>
                 {response && <p>{response}</p>}
                 {error && <p className="text-red-500 text-center text-xl font-medium">{error}</p>}
             </div>

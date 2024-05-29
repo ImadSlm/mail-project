@@ -20,6 +20,9 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
     let email_address = env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set");
     let email_password = env::var("EMAIL_PASSWORD").expect("EMAIL_PASSWORD must be set");
 
+    println!("EMAIL_ADDRESS: {:?}", env::var("EMAIL_ADDRESS"));
+    println!("EMAIL_PASSWORD: {:?}", env::var("EMAIL_PASSWORD"));
+
     let email = Message::builder()
         .from(email_address.parse().expect("Invalid from address"))
         .to(req.recipient.parse().expect("Invalid to address"))
@@ -27,17 +30,20 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
         .body(req.message.clone())
         .expect("Failed to build email");
 
-    let smtp_server = "smtp-mail.outlook.com";
+    let smtp_server = "office365.com"; //smtp-mail.outlook.com ou office365.com
 
     let mailer = SmtpTransport::relay(smtp_server)
         .expect("Failed to build mailer")
-        .credentials(Credentials::new(email_address, email_password))
+        .credentials(Credentials::new(email_address.clone(), email_password.clone()))
         .port(587)
         .build();
 
     match mailer.send(&email) {
         Ok(_) => HttpResponse::Ok().body("Message envoyé avec succès !"),
-        Err(e) => HttpResponse::InternalServerError().body(format!("Erreur lors de l'envoi du message : {:?}", e)),
+        Err(e) => {
+            println!("Erreur lors de l'envoi du message : {:?}", e);
+            HttpResponse::InternalServerError().body(format!("Erreur lors de l'envoi du message : {:?}", e))
+        }
     }
 }
 
