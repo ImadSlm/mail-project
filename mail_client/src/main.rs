@@ -2,6 +2,8 @@ use actix_web::{post,get, web, App, HttpResponse, HttpServer, Responder};
 use actix_cors::Cors;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
+use lettre::transport::smtp::client::Tls;
+use lettre::transport::smtp::client::TlsParameters;
 use serde::Deserialize;
 use dotenv::dotenv;
 use std::env;
@@ -20,8 +22,8 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
     let email_address = env::var("EMAIL_ADDRESS").expect("EMAIL_ADDRESS must be set");
     let email_password = env::var("EMAIL_PASSWORD").expect("EMAIL_PASSWORD must be set");
 
-    println!("EMAIL_ADDRESS: {:?}", env::var("EMAIL_ADDRESS"));
-    println!("EMAIL_PASSWORD: {:?}", env::var("EMAIL_PASSWORD"));
+    println!("EMAIL_ADDRESS: {:?}", email_address);
+    println!("EMAIL_PASSWORD: {:?}", email_password);
 
     let email = Message::builder()
         .from(email_address.parse().expect("Invalid from address"))
@@ -30,11 +32,16 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
         .body(req.message.clone())
         .expect("Failed to build email");
 
-    let smtp_server = "office365.com"; //smtp-mail.outlook.com ou office365.com
+    let smtp_server = "smtp.office365.com"; //smtp-mail.outlook.com ou office365.com
+    
+    let tls_parameters = TlsParameters::builder(smtp_server.to_string())
+        .build()
+        .expect("Failed to build TLS parameters");
 
     let mailer = SmtpTransport::relay(smtp_server)
         .expect("Failed to build mailer")
         .credentials(Credentials::new(email_address.clone(), email_password.clone()))
+        .tls(Tls::Required(tls_parameters))
         .port(587)
         .build();
 
