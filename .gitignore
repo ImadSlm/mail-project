@@ -1,0 +1,25 @@
+# Ignore Rust build directory
+mail_client/target
+
+# Ignore node_modules for frontend
+frontend/node_modules
+
+# Ignore environment variables file
+
+
+# Other files and directories to ignore
+.DS_Store
+/dist
+/build
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.bak
+*.cache
+*.log
+*.vs
