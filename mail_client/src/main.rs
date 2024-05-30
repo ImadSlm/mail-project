@@ -10,7 +10,7 @@ use std::env;
 
 #[derive(Deserialize)]
 struct EmailRequest {
-    recipient: String,
+    recipients: Vec<String>,
     subject: String,
     message: String,
 }
@@ -32,10 +32,15 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
     println!("EMAIL_ADDRESS: {:?}", email_address);
     println!("EMAIL_PASSWORD: {:?}", email_password);
 
-    let email = Message::builder()
+    let mut email_builder = Message::builder()
         .from(email_address.parse().expect("Invalid from address"))
-        .to(req.recipient.parse().expect("Invalid to address"))
-        .subject(&req.subject)
+        .subject(&req.subject);
+
+    for recipient in &req.recipients {
+        email_builder = email_builder.to(recipient.parse().expect("Invalid to address"));
+    }
+
+    let email = email_builder
         .body(req.message.clone())
         .expect("Failed to build email");
 
