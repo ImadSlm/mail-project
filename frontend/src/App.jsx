@@ -4,9 +4,9 @@ import loader from "./assets/loader.svg"
 import MailForm from "./components/MailForm"
 
 export default function App(){
-    const [recipient, setRecipient] = useState("imad.saleem@hotmail.fr")
-    const [subject, setSubject] = useState("subjtest")
-    const [message, setMessage] = useState("msgtest")
+    const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
+    const [subject, setSubject] = useState("sujet test")
+    const [message, setMessage] = useState("msg test")
     const [response, setResponse] = useState("")
     const [error, setError] = useState("")
     const [mailData, setMailData] = useState(null)
@@ -19,7 +19,7 @@ export default function App(){
         setError("")
         try {
             const res = await axios.post("http://localhost:8080/send_email", {
-                recipient,
+                recipients,
                 subject,
                 message,
             })
@@ -86,8 +86,8 @@ export default function App(){
                 </p>
                 
                 <MailForm 
-                    recipient={recipient}
-                    setRecipient={setRecipient}
+                    recipients={recipients}
+                    setRecipients={setRecipients}
                     subject={subject}
                     setSubject={setSubject}
                     message={message}

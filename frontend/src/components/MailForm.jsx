@@ -1,7 +1,7 @@
 export default function MailForm({
     handleSubmit,
-    recipient,
-    setRecipient,
+    recipients,
+    setRecipients,
     subject,
     setSubject,
     message,
@@ -9,15 +9,16 @@ export default function MailForm({
 }) {
     return (
         <form
-            onClick={handleSubmit}
+            onSubmit={e => handleSubmit(e)}
             className="justify-center border text-slate-100 border-slate-600 border-rounded px-6 py-6">
             <div className="form-element">
-                <label className="mt-2 mb-1">Destinataire :</label>
+                <label className="mt-2 mb-1">Destinataire(s) :</label>
                 <input
                     className="border-2 border-slate-500 p-1 bg-slate-900 w-96"
-                    type="email"
-                    value={recipient}
-                    onChange={(e) => setRecipient(e.target.value)}
+                    type="text"
+                    value={Array.isArray(recipients) ? recipients.join(",") : ""}
+                    onChange={(e) => setRecipients(e.target.value.split(",").map(email => email.trim()))}
+                    placeholder="Séparer les adresses par une virgule"
                     required
                 />
             </div>
