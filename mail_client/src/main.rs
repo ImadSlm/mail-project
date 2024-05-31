@@ -8,6 +8,7 @@ use dotenv::dotenv;
 use std::env;
 use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
+use chrono::{DateTime, Utc};
 
 #[derive(Deserialize)]
 struct EmailRequest {
@@ -21,8 +22,13 @@ struct Email {
     recipients: Vec<String>,
     subject: String,
     body: String,
-    date: SystemTime, // Use chrono DateTime for date
+    date: String, // Use chrono DateTime for date
     is_read: bool,
+}
+
+fn system_time_to_date_string(system_time: SystemTime) -> String {
+    let datetime: DateTime<Utc> = system_time.into();
+    datetime.to_rfc3339()
 }
 
 #[get("/get_email_address")]
@@ -87,8 +93,8 @@ async fn get_mail() -> impl Responder {
 async fn get_emails() -> impl Responder {
     // Données fictives pour la démonstration
     let emails = vec![
-        Email { id: 1, recipients: vec!["user@example.com".to_string()], subject: "Test Email 1".to_string(), body: "This is a test email.".to_string(), date: SystemTime::now(), is_read: false },
-        Email { id: 2, recipients: vec!["user@example.com".to_string()], subject: "Test Email 2".to_string(), body: "This is another test email.".to_string(), date: SystemTime::now(), is_read: true },
+        Email { id: 1, recipients: vec!["user@example.com".to_string()], subject: "Test Email 1".to_string(), body: "This is a test email.".to_string(), date: system_time_to_date_string(SystemTime::now()), is_read: false },
+        Email { id: 2, recipients: vec!["user@example.com".to_string()], subject: "Test Email 2".to_string(), body: "This is another test email.".to_string(), date: system_time_to_date_string(SystemTime::now()), is_read: true },
     ];
     HttpResponse::Ok().json(emails)
 }
