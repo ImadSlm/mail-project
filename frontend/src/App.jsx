@@ -3,7 +3,7 @@ import axios from "axios"
 import loader from "./assets/loader.svg"
 import MailForm from "./components/MailForm"
 
-export default function App(){
+export default function App() {
     const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
     const [subject, setSubject] = useState("sujet test")
     const [message, setMessage] = useState("msg test")
@@ -13,9 +13,9 @@ export default function App(){
     const [showEvent, setShowEvent] = useState(false)
     const [emailAddress, setEmailAddress] = useState("")
     const [loading, setLoading] = useState(true)
-    const [emails, setEmails] = useState([]);
-    const [showRead, setShowRead] = useState(true);
-    const [sortBy, setSortBy] = useState('date');
+    const [emails, setEmails] = useState([])
+    const [showRead, setShowRead] = useState(true)
+    const [sortBy, setSortBy] = useState("date")
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -38,12 +38,13 @@ export default function App(){
     }
 
     const getMail = async (e) => {
-        try {e.preventDefault()
-        const response = await fetch("http://localhost:8080/get_mail")
-        const data = await response.text()
-        console.log(data)
-        setMailData(data)}
-        catch (error) {
+        try {
+            e.preventDefault()
+            const response = await fetch("http://localhost:8080/get_mail")
+            const data = await response.text()
+            console.log(data)
+            setMailData(data)
+        } catch (error) {
             console.error("Failed to fetch mail data", error)
         }
     }
@@ -75,23 +76,26 @@ export default function App(){
     useEffect(() => {
         const fetchEmails = async () => {
             // Requête pour récupérer les emails depuis le backend
-            const response = await axios.get('http://127.0.0.1:8080/get_emails');
-            setEmails(response.data);
-        };
-        fetchEmails();
-    }, []);
-    
-     // Tri des emails en fonction du critère sélectionné
-     const sortedEmails = [...emails].sort((a, b) => {
-        if (sortBy === 'date') {
-            return new Date(b.date) - new Date(a.date);
-        } else if (sortBy === 'recipient') {
-            return a.recipient.localeCompare(b.recipient);
+            const response = await axios.get("http://127.0.0.1:8080/get_emails")
+            setEmails(response.data)
         }
-        return 0;
-    });
+        fetchEmails()
+    }, [])
 
-    const filteredEmails = showRead ? sortedEmails : sortedEmails.filter(email => !email.is_read);
+    // Tri des emails en fonction du critère sélectionné
+    const sortedEmails = [...emails].sort((a, b) => {
+        if (sortBy === "date") {
+            return new Date(b.date) - new Date(a.date)
+        } else if (sortBy === "recipient") {
+            return a.recipient.localeCompare(b.recipient)
+        }
+        return 0
+    })
+
+    const filteredEmails = showRead
+        ? sortedEmails
+        : sortedEmails.filter((email) => !email.is_read)
+
     return (
         <div className="bg-slate-800 flex justify-center h-screen">
             <div className="ml-4 text-center">
@@ -101,13 +105,17 @@ export default function App(){
 
                 <p className="text-slate-400 py-5 ml-4 ">
                     {loading || !emailAddress ? (
-                        <img src={loader} className="mx-auto" alt="Loading..." />
+                        <img
+                            src={loader}
+                            className="mx-auto"
+                            alt="Loading..."
+                        />
                     ) : (
                         `Connecté en tant que ${emailAddress}`
                     )}
                 </p>
-                
-                <MailForm 
+
+                <MailForm
                     recipients={recipients}
                     setRecipients={setRecipients}
                     subject={subject}
@@ -119,7 +127,8 @@ export default function App(){
 
                 <button
                     onClick={getMail}
-                    className="border-rounded border-slate-400 text-slate-200 bg-green-700 mx-6 hover:bg-green-800 my-6 px-2 py-0">
+                    className="border-rounded border-slate-400 text-slate-200 bg-green-700 mx-6 hover:bg-green-800 my-6 px-2 py-0"
+                >
                     Récuperer le mail
                 </button>
 
@@ -130,9 +139,7 @@ export default function App(){
                     </div>
                 )}
 
-                {showEvent && (
-                    <p className="text-xl text-white">{response}</p>
-                )}
+                {showEvent && <p className="text-xl text-white">{response}</p>}
 
                 {error && (
                     <p className="text-red-500 text-center text-xl font-medium">
@@ -141,36 +148,48 @@ export default function App(){
                 )}
             </div>
 
-            <div>
-            <h1>Email List</h1>
-            <div>
-                {/* Option pour masquer ou afficher les emails lus */}
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={showRead}
-                        onChange={() => setShowRead(!showRead)}
-                    />
-                    Show Read Emails
-                </label>
-                {/* Option pour trier les emails par date ou par destinataire */}
-                <select onChange={e => setSortBy(e.target.value)} value={sortBy}>
-                    <option value="date">Sort by Date</option>
-                    <option value="recipient">Sort by Recipient</option>
-                </select>
+            <div className="flex flex-col text-slate-300">
+                <h1 className="flex flex-col">Email List</h1>
+                <div>
+                    {/* Option pour masquer ou afficher les emails lus */}
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={showRead}
+                            onChange={() => setShowRead(!showRead)}
+                        />
+                        Show Read Emails
+                    </label>
+                    {/* Option pour trier les emails par date ou par destinataire */}
+                    <select
+                        onChange={(e) => setSortBy(e.target.value)}
+                        value={sortBy}
+                    >
+                        <option value="date">Sort by Date</option>
+                        <option value="recipient">Sort by Recipient</option>
+                    </select>
+                </div>
+                <ul>
+                    {/* Affichage des emails filtrés et triés */}
+                    {filteredEmails.map((email) => (
+                        <li
+                            key={email.id}
+                            style={{
+                                fontWeight: email.is_read ? "normal" : "bold",
+                            }}
+                        >
+                            <h2>{email.subject}</h2>
+                            <p>{email.body}</p>
+                            <p>
+                                <strong>Recipient:</strong> {email.recipient}
+                            </p>
+                            <p>
+                                <strong>Date:</strong> {email.date}
+                            </p>
+                        </li>
+                    ))}
+                </ul>
             </div>
-            <ul>
-                {/* Affichage des emails filtrés et triés */}
-                {filteredEmails.map(email => (
-                    <li key={email.id} style={{ fontWeight: email.is_read ? 'normal' : 'bold' }}>
-                        <h2>{email.subject}</h2>
-                        <p>{email.body}</p>
-                        <p><strong>Recipient:</strong> {email.recipient}</p>
-                        <p><strong>Date:</strong> {email.date}</p>
-                    </li>
-                ))}
-            </ul>
-        </div>
 
             <footer className="fixed w-full border-t-2 border-slate-600 text-center text-slate-100 bottom-0 py-2">
                 Mouad Moubtakir - Imad Saleem

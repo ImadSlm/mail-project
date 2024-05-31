@@ -4,11 +4,8 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use lettre::transport::smtp::client::Tls;
 use lettre::transport::smtp::client::TlsParameters;
-
 use dotenv::dotenv;
 use std::env;
-use chrono::DateTime;
-use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 
