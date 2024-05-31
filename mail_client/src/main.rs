@@ -4,15 +4,28 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use lettre::transport::smtp::client::Tls;
 use lettre::transport::smtp::client::TlsParameters;
-use serde::Deserialize;
+
 use dotenv::dotenv;
 use std::env;
+use chrono::DateTime;
+use chrono::Utc;
+use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 
 #[derive(Deserialize)]
 struct EmailRequest {
     recipients: Vec<String>,
     subject: String,
     message: String,
+}
+#[derive(Serialize, Deserialize)] // Add Serialize and Deserialize to Email struct
+struct Email {
+    id: u32,
+    recipients: Vec<String>,
+    subject: String,
+    body: String,
+    date: SystemTime, // Use chrono DateTime for date
+    is_read: bool,
 }
 
 #[get("/get_email_address")]
@@ -71,6 +84,18 @@ async fn get_mail() -> impl Responder {
     HttpResponse::Ok().body("Mail récupéré avec succès !")
 }
 
+
+// Nouvelle route pour récupérer la liste des emails
+#[get("/get_emails")]
+async fn get_emails() -> impl Responder {
+    // Données fictives pour la démonstration
+    let emails = vec![
+        Email { id: 1, recipients: vec!["user@example.com".to_string()], subject: "Test Email 1".to_string(), body: "This is a test email.".to_string(), date: SystemTime::now(), is_read: false },
+        Email { id: 2, recipients: vec!["user@example.com".to_string()], subject: "Test Email 2".to_string(), body: "This is another test email.".to_string(), date: SystemTime::now(), is_read: true },
+    ];
+    HttpResponse::Ok().json(emails)
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
@@ -84,6 +109,7 @@ async fn main() -> std::io::Result<()> {
             .service(send_email)
             .service(get_email_address)
             .service(get_mail)
+            .service(get_emails) // Enregistrement de la nouvelle route
     })
     .bind(("127.0.0.1", 8080))?
     .run()

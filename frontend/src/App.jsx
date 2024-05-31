@@ -13,6 +13,9 @@ export default function App(){
     const [showEvent, setShowEvent] = useState(false)
     const [emailAddress, setEmailAddress] = useState("")
     const [loading, setLoading] = useState(true)
+    const [emails, setEmails] = useState([]);
+    const [showRead, setShowRead] = useState(true);
+    const [sortBy, setSortBy] = useState('date');
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -69,7 +72,26 @@ export default function App(){
             }, 5000)
         }
     }, [response])
+    useEffect(() => {
+        const fetchEmails = async () => {
+            // Requête pour récupérer les emails depuis le backend
+            const response = await axios.get('http://127.0.0.1:8080/get_emails');
+            setEmails(response.data);
+        };
+        fetchEmails();
+    }, []);
+    
+     // Tri des emails en fonction du critère sélectionné
+     const sortedEmails = [...emails].sort((a, b) => {
+        if (sortBy === 'date') {
+            return new Date(b.date) - new Date(a.date);
+        } else if (sortBy === 'recipient') {
+            return a.recipient.localeCompare(b.recipient);
+        }
+        return 0;
+    });
 
+    const filteredEmails = showRead ? sortedEmails : sortedEmails.filter(email => !email.is_read);
     return (
         <div className="bg-slate-800 flex justify-center h-screen">
             <div className="ml-4 text-center">
@@ -118,6 +140,37 @@ export default function App(){
                     </p>
                 )}
             </div>
+
+            <div>
+            <h1>Email List</h1>
+            <div>
+                {/* Option pour masquer ou afficher les emails lus */}
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={showRead}
+                        onChange={() => setShowRead(!showRead)}
+                    />
+                    Show Read Emails
+                </label>
+                {/* Option pour trier les emails par date ou par destinataire */}
+                <select onChange={e => setSortBy(e.target.value)} value={sortBy}>
+                    <option value="date">Sort by Date</option>
+                    <option value="recipient">Sort by Recipient</option>
+                </select>
+            </div>
+            <ul>
+                {/* Affichage des emails filtrés et triés */}
+                {filteredEmails.map(email => (
+                    <li key={email.id} style={{ fontWeight: email.is_read ? 'normal' : 'bold' }}>
+                        <h2>{email.subject}</h2>
+                        <p>{email.body}</p>
+                        <p><strong>Recipient:</strong> {email.recipient}</p>
+                        <p><strong>Date:</strong> {email.date}</p>
+                    </li>
+                ))}
+            </ul>
+        </div>
 
             <footer className="fixed w-full border-t-2 border-slate-600 text-center text-slate-100 bottom-0 py-2">
                 Mouad Moubtakir - Imad Saleem
