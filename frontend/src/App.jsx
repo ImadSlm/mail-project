@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useEffect } from "react";
 import axios from "axios";
 import loader from "./assets/loader.svg";
 import MailForm from "./components/MailForm";
@@ -118,12 +119,12 @@ export default function App() {
                     handleSubmit={handleSubmit}
                 />
 
-                <button
+                {/* <button
                     onClick={getMail}
                     className="border-rounded border-slate-400 text-slate-200 bg-green-700 mx-6 hover:bg-green-800 my-6 px-2 py-0"
                 >
                     Récuperer le mail
-                </button>
+                </button> */}
 
                 {mailData && (
                     <div className="mt-4 text-white">
@@ -142,7 +143,7 @@ export default function App() {
             </div>
 
             <div className="flex flex-col text-slate-300">
-                <h1 className="flex flex-col">Email List</h1>
+                <h1 className="flex flex-col">Boite de réception</h1>
                 <div>
                     {/* Option to show or hide read emails */}
                     <label>
@@ -151,15 +152,15 @@ export default function App() {
                             checked={showRead}
                             onChange={() => setShowRead(!showRead)}
                         />
-                        Show Read Emails
+                        Montrer les emails lus
                     </label>
                     {/* Option to sort emails by date or recipient */}
                     <select
                         onChange={(e) => setSortBy(e.target.value)}
                         value={sortBy}
                     >
-                        <option value="date">Sort by Date</option>
-                        <option value="recipient">Sort by Recipient</option>
+                        <option value="date">Trier par date</option>
+                        <option value="recipient">Trier par destinataire</option>
                     </select>
                 </div>
                 <ul>
@@ -170,14 +171,18 @@ export default function App() {
                             style={{
                                 fontWeight: email.is_read ? "normal" : "bold",
                             }}
+                            className="border-2 border-slate-600 p-2"
                         >
+                            <p>
+                                <strong>De :</strong> {email.author}
+                            </p>
+                            <p>
+                                <strong>À :</strong> {email.recipients.join(", ")}
+                            </p>
                             <h2>{email.subject}</h2>
                             <p>{email.body}</p>
                             <p>
-                                <strong>Recipient:</strong> {email.recipients.join(", ")}
-                            </p>
-                            <p>
-                                <strong>Date:</strong> {email.date}
+                                <strong>Date :</strong> {email.date}
                             </p>
                         </li>
                     ))}

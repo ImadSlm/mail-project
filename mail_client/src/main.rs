@@ -26,6 +26,7 @@ struct EmailRequest {
 #[derive(Serialize, Deserialize)] // Add Serialize and Deserialize to Email struct
 struct Email {
     id: u32,
+    author: String,
     recipients: Vec<String>,
     subject: String,
     body: String,
@@ -33,10 +34,10 @@ struct Email {
     is_read: bool,
 }
 
-fn system_time_to_date_string(system_time: SystemTime) -> String {
-    let datetime: DateTime<Utc> = system_time.into();
-    datetime.to_rfc3339()
-}
+// fn system_time_to_date_string(system_time: SystemTime) -> String {
+//     let datetime: DateTime<Utc> = system_time.into();
+//     datetime.to_rfc3339()
+// }
 
 #[get("/get_email_address")]
 async fn get_email_address() -> impl Responder {
@@ -113,12 +114,14 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
     for message in messages.iter() {
         if let Some(body) = message.body() {
             let parsed = parse_mail(body)?;  // Added for parsing email
+            let author: String = parsed.headers.get_first_value("From").unwrap_or_default();
             let subject = parsed.headers.get_first_value("Subject").unwrap_or_default();
             let date = parsed.headers.get_first_value("Date").unwrap_or_default();
             let body = parsed.get_body().unwrap_or_default();
 
             emails.push(Email {
                 id,
+                author,
                 recipients: vec![email_address.clone()],
                 subject,
                 body,
