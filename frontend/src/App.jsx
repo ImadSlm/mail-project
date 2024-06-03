@@ -1,109 +1,118 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react";
-import axios from "axios";
-import loader from "./assets/loader.svg";
-import MailForm from "./components/MailForm";
+import { useState, useEffect } from "react"
+import axios from "axios"
+import loader from "./assets/loader.svg"
+import MailForm from "./components/MailForm"
+import createPortal from "react-dom"
+import Modal from "./components/Modal"
 
 export default function App() {
-    const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"]);
-    const [subject, setSubject] = useState("sujet test");
-    const [message, setMessage] = useState("msg test");
-    const [response, setResponse] = useState("");
-    const [error, setError] = useState("");
-    const [mailData, setMailData] = useState(null);
-    const [showEvent, setShowEvent] = useState(false);
-    const [emailAddress, setEmailAddress] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [emails, setEmails] = useState([]);  // Added state to hold fetched emails
-    const [showRead, setShowRead] = useState(true);
-    const [sortBy, setSortBy] = useState("date");
+    const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
+    const [subject, setSubject] = useState("sujet test")
+    const [message, setMessage] = useState("msg test")
+    const [response, setResponse] = useState("")
+    const [error, setError] = useState("")
+    const [mailData, setMailData] = useState(null)
+    const [showEvent, setShowEvent] = useState(false)
+    const [emailAddress, setEmailAddress] = useState("")
+    const [loading, setLoading] = useState(true)
+    const [emails, setEmails] = useState([]) // Added state to hold fetched emails
+    const [showRead, setShowRead] = useState(true)
+    const [sortBy, setSortBy] = useState("date")
+    const [selectedEmail, setSelectedEmail] = useState(null)
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
+        e.preventDefault()
+        setError("")
         try {
             const res = await axios.post("http://localhost:8080/send_email", {
                 recipients,
                 subject,
                 message,
-            });
-            console.log(res);
-            setResponse(res.data);
+            })
+            console.log(res)
+            setResponse(res.data)
         } catch (error) {
             if (error.response && error.response.status === 500) {
-                setError("Une erreur interne du serveur est survenue.");
+                setError("Une erreur interne du serveur est survenue.")
             } else {
-                setError(`Erreur : ${error.message}`);
+                setError(`Erreur : ${error.message}`)
             }
         }
-    };
+    }
 
     const getMail = async (e) => {
         try {
-            e.preventDefault();
-            const response = await fetch("http://localhost:8080/get_mail");
-            const data = await response.text();
-            console.log(data);
-            setMailData(data);
+            e.preventDefault()
+            const response = await fetch("http://localhost:8080/get_mail")
+            const data = await response.text()
+            console.log(data)
+            setMailData(data)
         } catch (error) {
-            console.error("Failed to fetch mail data", error);
+            console.error("Failed to fetch mail data", error)
         }
-    };
+    }
 
     useEffect(() => {
         const fetchEmailAddress = async () => {
             try {
-                const res = await axios.get("http://localhost:8080/get_email_address");
-                setEmailAddress(res.data);
+                const res = await axios.get(
+                    "http://localhost:8080/get_email_address"
+                )
+                setEmailAddress(res.data)
             } catch (error) {
-                console.error("Failed to fetch email address", error);
+                console.error("Failed to fetch email address", error)
             } finally {
-                setLoading(false);
+                setLoading(false)
             }
-        };
-        fetchEmailAddress();
-    }, []);
+        }
+        fetchEmailAddress()
+    }, [])
 
     useEffect(() => {
         if (response) {
-            setShowEvent(true);
+            setShowEvent(true)
             setTimeout(() => {
-                setShowEvent(false);
-            }, 5000);
+                setShowEvent(false)
+            }, 5000)
         }
-    }, [response]);
+    }, [response])
 
     useEffect(() => {
         const fetchEmails = async () => {
-            const response = await axios.get("http://127.0.0.1:8080/get_emails");  // Added to fetch emails from backend
-            setEmails(response.data);  // Set fetched emails to state
-        };
-        fetchEmails();
-    }, []);
+            const response = await axios.get("http://127.0.0.1:8080/get_emails") // Added to fetch emails from backend
+            setEmails(response.data) // Set fetched emails to state
+        }
+        fetchEmails()
+    }, [])
 
     const sortedEmails = [...emails].sort((a, b) => {
         if (sortBy === "date") {
-            return new Date(b.date) - new Date(a.date);
+            return new Date(b.date) - new Date(a.date)
         } else if (sortBy === "recipient") {
-            return a.recipients[0].localeCompare(b.recipients[0]);
+            return a.recipients[0].localeCompare(b.recipients[0])
         }
-        return 0;
-    });
+        return 0
+    })
 
     const filteredEmails = showRead
         ? sortedEmails
-        : sortedEmails.filter((email) => !email.is_read);
+        : sortedEmails.filter((email) => !email.is_read)
 
     return (
         <div className="bg-slate-800 flex justify-center h-screen">
             <div className="ml-4 text-center">
                 <h1 className="text-4xl font-semibold text-center border-b-2 pb-2 text-white">
-                    Client Mail
+                    Envoyer un mail
                 </h1>
 
                 <p className="text-slate-400 py-5 ml-4 ">
                     {loading || !emailAddress ? (
-                        <img src={loader} className="mx-auto" alt="Loading..." />
+                        <img
+                            src={loader}
+                            className="mx-auto"
+                            alt="Loading..."
+                        />
                     ) : (
                         `Connecté en tant que ${emailAddress}`
                     )}
@@ -142,9 +151,9 @@ export default function App() {
                 )}
             </div>
 
-            <div className="flex flex-col text-slate-300">
-                <h1 className="flex flex-col">Boite de réception</h1>
-                <div>
+            <div className="flex flex-col text-slate-300 ml-10">
+                <h1 className="text-4xl font-semibold text-center border-b-2 pb-2 text-white">Boite de réception</h1>
+                <div className="my-2">
                     {/* Option to show or hide read emails */}
                     <label>
                         <input
@@ -157,41 +166,76 @@ export default function App() {
                     {/* Option to sort emails by date or recipient */}
                     <select
                         onChange={(e) => setSortBy(e.target.value)}
-                        value={sortBy}
-                    >
+                        value={sortBy}>
                         <option value="date">Trier par date</option>
-                        <option value="recipient">Trier par destinataire</option>
+                        <option value="recipient">
+                            Trier par destinataire
+                        </option>
                     </select>
                 </div>
                 <ul>
                     {/* Display filtered and sorted emails */}
                     {filteredEmails.map((email) => (
+                        // <li
+                        //     key={email.id}
+                        //     style={{
+                        //         fontWeight: email.is_read ? "normal" : "bold",
+                        //     }}
+                        //     className="border-2 border-slate-600 p-2"
+                        // >
+                        //     <p>
+                        //         <strong>De :</strong> {email.author}
+                        //     </p>
+                        //     <p>
+                        //         <strong>À :</strong> {email.recipients.join(", ")}
+                        //     </p>
+                        //     <h2>{email.subject}</h2>
+                        //     <p>{email.body}</p>
+                        //     <p>
+                        //         <strong>Date :</strong> {email.date}
+                        //     </p>
+                        // </li>
                         <li
+                            className="my-2 border-2 border-slate-600 p-2 cursor-pointer hover:bg-slate-700"
                             key={email.id}
                             style={{
                                 fontWeight: email.is_read ? "normal" : "bold",
                             }}
-                            className="border-2 border-slate-600 p-2"
-                        >
+                            onClick={() => setSelectedEmail(email)}>
                             <p>
-                                <strong>De :</strong> {email.author}
+                                <u>De :</u> {email.author}
                             </p>
+                            <p>{email.subject}</p>
                             <p>
-                                <strong>À :</strong> {email.recipients.join(", ")}
-                            </p>
-                            <h2>{email.subject}</h2>
-                            <p>{email.body}</p>
-                            <p>
-                                <strong>Date :</strong> {email.date}
+                                <u>Date :</u> {email.date}
                             </p>
                         </li>
                     ))}
                 </ul>
+                {selectedEmail && (
+                    <Modal onClose={() => setSelectedEmail(null)}>
+                        <button className="bg-red-600 absolute flex hover:bg-red-800 text-white w-8 h-8 rounded px-3 py-1 top-2 right-2" onClick={() => setSelectedEmail(null)}>
+                            X
+                        </button>
+                        <p>
+                                <strong>De :</strong> {selectedEmail.author}
+                        </p>
+                        <p>
+                            <strong>À :</strong>{" "}
+                            {selectedEmail.recipients.join(", ")}
+                        </p>
+                        <h2>{selectedEmail.subject}</h2>
+                        <p>{selectedEmail.body}</p>
+                        <p>
+                            <strong>Date:</strong> {selectedEmail.date}
+                        </p>
+                    </Modal>
+                )}
             </div>
 
             <footer className="fixed w-full border-t-2 border-slate-600 text-center text-slate-100 bottom-0 py-2">
                 Mouad Moubtakir - Imad Saleem
             </footer>
         </div>
-    );
+    )
 }

@@ -7,10 +7,10 @@ use lettre::transport::smtp::client::TlsParameters;
 use dotenv::dotenv;
 use std::env;
 use serde::{Deserialize, Serialize};
-use std::time::SystemTime;
-use chrono::{DateTime, Utc};
+// use std::time::SystemTime;
+// use chrono::{DateTime, Utc};
 use native_tls::TlsConnector; // Added for TLS connection
-use imap::Session; // Added for IMAP session
+// use imap::Session; // Added for IMAP session
 use std::net::TcpStream; // Added for TCP connection
 use mailparse::parse_mail; // Added for parsing email
 use mailparse::MailHeaderMap;
