@@ -1,100 +1,97 @@
-import React, { useState, useEffect } from "react"
-import axios from "axios"
-import loader from "./assets/loader.svg"
-import MailForm from "./components/MailForm"
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import loader from "./assets/loader.svg";
+import MailForm from "./components/MailForm";
 
 export default function App() {
-    const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
-    const [subject, setSubject] = useState("sujet test")
-    const [message, setMessage] = useState("msg test")
-    const [response, setResponse] = useState("")
-    const [error, setError] = useState("")
-    const [mailData, setMailData] = useState(null)
-    const [showEvent, setShowEvent] = useState(false)
-    const [emailAddress, setEmailAddress] = useState("")
-    const [loading, setLoading] = useState(true)
-    const [emails, setEmails] = useState([])
-    const [showRead, setShowRead] = useState(true)
-    const [sortBy, setSortBy] = useState("date")
+    const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"]);
+    const [subject, setSubject] = useState("sujet test");
+    const [message, setMessage] = useState("msg test");
+    const [response, setResponse] = useState("");
+    const [error, setError] = useState("");
+    const [mailData, setMailData] = useState(null);
+    const [showEvent, setShowEvent] = useState(false);
+    const [emailAddress, setEmailAddress] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [emails, setEmails] = useState([]);  // Added state to hold fetched emails
+    const [showRead, setShowRead] = useState(true);
+    const [sortBy, setSortBy] = useState("date");
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
-        setError("")
+        e.preventDefault();
+        setError("");
         try {
             const res = await axios.post("http://localhost:8080/send_email", {
                 recipients,
                 subject,
                 message,
-            })
-            console.log(res)
-            setResponse(res.data)
+            });
+            console.log(res);
+            setResponse(res.data);
         } catch (error) {
             if (error.response && error.response.status === 500) {
-                setError("Une erreur interne du serveur est survenue.")
+                setError("Une erreur interne du serveur est survenue.");
             } else {
-                setError(`Erreur : ${error.message}`)
+                setError(`Erreur : ${error.message}`);
             }
         }
-    }
+    };
 
     const getMail = async (e) => {
         try {
-            e.preventDefault()
-            const response = await fetch("http://localhost:8080/get_mail")
-            const data = await response.text()
-            console.log(data)
-            setMailData(data)
+            e.preventDefault();
+            const response = await fetch("http://localhost:8080/get_mail");
+            const data = await response.text();
+            console.log(data);
+            setMailData(data);
         } catch (error) {
-            console.error("Failed to fetch mail data", error)
+            console.error("Failed to fetch mail data", error);
         }
-    }
+    };
 
     useEffect(() => {
         const fetchEmailAddress = async () => {
             try {
-                const res = await axios.get(
-                    "http://localhost:8080/get_email_address"
-                )
-                setEmailAddress(res.data)
+                const res = await axios.get("http://localhost:8080/get_email_address");
+                setEmailAddress(res.data);
             } catch (error) {
-                console.error("Failed to fetch email address", error)
+                console.error("Failed to fetch email address", error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
-        fetchEmailAddress()
-    }, [])
+        };
+        fetchEmailAddress();
+    }, []);
 
     useEffect(() => {
         if (response) {
-            setShowEvent(true)
+            setShowEvent(true);
             setTimeout(() => {
-                setShowEvent(false)
-            }, 5000)
+                setShowEvent(false);
+            }, 5000);
         }
-    }, [response])
+    }, [response]);
+
     useEffect(() => {
         const fetchEmails = async () => {
-            // Requête pour récupérer les emails depuis le backend
-            const response = await axios.get("http://127.0.0.1:8080/get_emails")
-            setEmails(response.data)
-        }
-        fetchEmails()
-    }, [])
+            const response = await axios.get("http://127.0.0.1:8080/get_emails");  // Added to fetch emails from backend
+            setEmails(response.data);  // Set fetched emails to state
+        };
+        fetchEmails();
+    }, []);
 
-    // Tri des emails en fonction du critère sélectionné
     const sortedEmails = [...emails].sort((a, b) => {
         if (sortBy === "date") {
-            return new Date(b.date) - new Date(a.date)
+            return new Date(b.date) - new Date(a.date);
         } else if (sortBy === "recipient") {
-            return a.recipient.localeCompare(b.recipient)
+            return a.recipients[0].localeCompare(b.recipients[0]);
         }
-        return 0
-    })
+        return 0;
+    });
 
     const filteredEmails = showRead
         ? sortedEmails
-        : sortedEmails.filter((email) => !email.is_read)
+        : sortedEmails.filter((email) => !email.is_read);
 
     return (
         <div className="bg-slate-800 flex justify-center h-screen">
@@ -105,11 +102,7 @@ export default function App() {
 
                 <p className="text-slate-400 py-5 ml-4 ">
                     {loading || !emailAddress ? (
-                        <img
-                            src={loader}
-                            className="mx-auto"
-                            alt="Loading..."
-                        />
+                        <img src={loader} className="mx-auto" alt="Loading..." />
                     ) : (
                         `Connecté en tant que ${emailAddress}`
                     )}
@@ -151,7 +144,7 @@ export default function App() {
             <div className="flex flex-col text-slate-300">
                 <h1 className="flex flex-col">Email List</h1>
                 <div>
-                    {/* Option pour masquer ou afficher les emails lus */}
+                    {/* Option to show or hide read emails */}
                     <label>
                         <input
                             type="checkbox"
@@ -160,7 +153,7 @@ export default function App() {
                         />
                         Show Read Emails
                     </label>
-                    {/* Option pour trier les emails par date ou par destinataire */}
+                    {/* Option to sort emails by date or recipient */}
                     <select
                         onChange={(e) => setSortBy(e.target.value)}
                         value={sortBy}
@@ -170,7 +163,7 @@ export default function App() {
                     </select>
                 </div>
                 <ul>
-                    {/* Affichage des emails filtrés et triés */}
+                    {/* Display filtered and sorted emails */}
                     {filteredEmails.map((email) => (
                         <li
                             key={email.id}
@@ -181,7 +174,7 @@ export default function App() {
                             <h2>{email.subject}</h2>
                             <p>{email.body}</p>
                             <p>
-                                <strong>Recipient:</strong> {email.recipient}
+                                <strong>Recipient:</strong> {email.recipients.join(", ")}
                             </p>
                             <p>
                                 <strong>Date:</strong> {email.date}
@@ -195,5 +188,5 @@ export default function App() {
                 Mouad Moubtakir - Imad Saleem
             </footer>
         </div>
-    )
+    );
 }
