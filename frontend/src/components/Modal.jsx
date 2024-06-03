@@ -43,7 +43,7 @@ const Modal = ({ children, onClose }) => {
 
     return createPortal(
         <div className="fixed inset-0 bg-gray-700/75 flex items-center justify-center z-50" onClick={onClose}>
-            <div className="bg-white fixed p-4 pt-10 rounded" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white fixed p-4 pt-12 rounded" onClick={(e) => e.stopPropagation()}>
                 {children}
             </div>
         </div>,

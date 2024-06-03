@@ -29,6 +29,7 @@ export default function App() {
                 recipients,
                 subject,
                 message,
+                in_reply_to: selectedEmail ? selectedEmail.id : null,
             })
             console.log(res)
             setResponse(res.data)
@@ -99,140 +100,154 @@ export default function App() {
         ? sortedEmails
         : sortedEmails.filter((email) => !email.is_read)
 
+    const handleReply = (email) => {
+        setRecipients([email.author])
+        setSubject(`RE: ${email.subject}`)
+        setMessage(`\n\n----\n${email.body}`)
+        setSelectedEmail(null)
+    }
+
     return (
-        <div className="bg-slate-800 flex justify-center h-screen">
-            <div className="ml-4 text-center">
-                <h1 className="text-4xl font-semibold text-center border-b-2 pb-2 text-white">
-                    Envoyer un mail
-                </h1>
+        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-screen">
+            <header className="top-0 text-4xl p-1 fixed font-semibold text-slate-100 mb-10 w-full border-b-2 border-slate-600 text-center">
+                CLIENT MAIL
+            </header>
 
-                <p className="text-slate-400 py-5 ml-4 ">
-                    {loading || !emailAddress ? (
-                        <img
-                            src={loader}
-                            className="mx-auto"
-                            alt="Loading..."
-                        />
-                    ) : (
-                        `Connecté en tant que ${emailAddress}`
-                    )}
-                </p>
+            <div className="mt-12 p-2 flex">
+                <div className="text-center mr-12">
+                    <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
+                        Envoyer un mail
+                    </h1>
 
-                <MailForm
-                    recipients={recipients}
-                    setRecipients={setRecipients}
-                    subject={subject}
-                    setSubject={setSubject}
-                    message={message}
-                    setMessage={setMessage}
-                    handleSubmit={handleSubmit}
-                />
-
-                {/* <button
-                    onClick={getMail}
-                    className="border-rounded border-slate-400 text-slate-200 bg-green-700 mx-6 hover:bg-green-800 my-6 px-2 py-0"
-                >
-                    Récuperer le mail
-                </button> */}
-
-                {mailData && (
-                    <div className="mt-4 text-white">
-                        <h6 className="text-2xl">Mail reçu:</h6>
-                        <p>{mailData}</p>
-                    </div>
-                )}
-
-                {showEvent && <p className="text-xl text-white">{response}</p>}
-
-                {error && (
-                    <p className="text-red-500 text-center text-xl font-medium">
-                        {error}
+                    <p className="text-slate-400 py-5 ml-4 ">
+                        {loading || !emailAddress ? (
+                            <img
+                                src={loader}
+                                className="mx-auto"
+                                alt="Loading..."
+                            />
+                        ) : (
+                            `Connecté en tant que ${emailAddress}`
+                        )}
                     </p>
-                )}
-            </div>
 
-            <div className="flex flex-col text-slate-300 ml-10">
-                <h1 className="text-4xl font-semibold text-center border-b-2 pb-2 text-white">Boite de réception</h1>
-                <div className="my-2">
-                    {/* Option to show or hide read emails */}
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={showRead}
-                            onChange={() => setShowRead(!showRead)}
-                        />
-                        Montrer les emails lus
-                    </label>
-                    {/* Option to sort emails by date or recipient */}
-                    <select
-                        onChange={(e) => setSortBy(e.target.value)}
-                        value={sortBy}>
-                        <option value="date">Trier par date</option>
-                        <option value="recipient">
-                            Trier par destinataire
-                        </option>
-                    </select>
+                    <MailForm
+                        recipients={recipients}
+                        setRecipients={setRecipients}
+                        subject={subject}
+                        setSubject={setSubject}
+                        message={message}
+                        setMessage={setMessage}
+                        handleSubmit={handleSubmit}
+                    />
+
+                    {mailData && (
+                        <div className="mt-4 text-white">
+                            <h6 className="text-2xl">Mail reçu:</h6>
+                            <p>{mailData}</p>
+                        </div>
+                    )}
+
+                    {showEvent && (
+                        <p className="text-xl text-white">{response}</p>
+                    )}
+
+                    {error && (
+                        <p className="text-red-500 text-center text-xl font-medium">
+                            {error}
+                        </p>
+                    )}
                 </div>
-                <ul>
-                    {/* Display filtered and sorted emails */}
-                    {filteredEmails.map((email) => (
-                        // <li
-                        //     key={email.id}
-                        //     style={{
-                        //         fontWeight: email.is_read ? "normal" : "bold",
-                        //     }}
-                        //     className="border-2 border-slate-600 p-2"
-                        // >
-                        //     <p>
-                        //         <strong>De :</strong> {email.author}
-                        //     </p>
-                        //     <p>
-                        //         <strong>À :</strong> {email.recipients.join(", ")}
-                        //     </p>
-                        //     <h2>{email.subject}</h2>
-                        //     <p>{email.body}</p>
-                        //     <p>
-                        //         <strong>Date :</strong> {email.date}
-                        //     </p>
-                        // </li>
-                        <li
-                            className="my-2 border-2 border-slate-600 p-2 cursor-pointer hover:bg-slate-700"
-                            key={email.id}
-                            style={{
-                                fontWeight: email.is_read ? "normal" : "bold",
-                            }}
-                            onClick={() => setSelectedEmail(email)}>
-                            <p>
-                                <u>De :</u> {email.author}
-                            </p>
-                            <p>{email.subject}</p>
-                            <p>
-                                <u>Date :</u> {email.date}
-                            </p>
-                        </li>
-                    ))}
-                </ul>
-                {selectedEmail && (
-                    <Modal onClose={() => setSelectedEmail(null)}>
-                        <button className="bg-red-600 absolute flex hover:bg-red-800 text-white w-8 h-8 rounded px-3 py-1 top-2 right-2" onClick={() => setSelectedEmail(null)}>
-                            X
-                        </button>
-                        <p>
-                                <strong>De :</strong> {selectedEmail.author}
-                        </p>
-                        <p>
-                            <strong>À :</strong>{" "}
-                            {selectedEmail.recipients.join(", ")}
-                        </p>
-                        <h2>{selectedEmail.subject}</h2>
-                        <p>{selectedEmail.body}</p>
-                        <p>
-                            <strong>Date:</strong> {selectedEmail.date}
-                        </p>
-                    </Modal>
-                )}
-            </div>
 
+                <div className="flex flex-col text-slate-300 ">
+                    <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
+                        Boite de réception
+                    </h1>
+                    <div className="my-2 text-center items-center p-2">
+                        {/* Option to show or hide read emails */}
+                        <label className="mr-8">
+                            <input
+                                className="mr-2"
+                                type="checkbox"
+                                checked={showRead}
+                                onChange={() => setShowRead(!showRead)}
+                            />
+                            Montrer les emails lus
+                        </label>
+                        {/* Option to sort emails by date or recipient */}
+                        <select
+                            className="border-2 border-slate-600 p-1 bg-slate-900 w-48"
+                            onChange={(e) => setSortBy(e.target.value)}
+                            value={sortBy}>
+                            <option value="date">Trier par date</option>
+                            <option value="recipient">
+                                Trier par destinataire
+                            </option>
+                        </select>
+                    </div>
+                    <ul>
+                        {/* Display filtered and sorted emails */}
+                        {(showRead
+                            ? filteredEmails
+                            : filteredEmails.filter((email) => !email.is_read)
+                        ).map((email) => (
+                            <li
+                                className="relative my-2 border-2 border-slate-600 p-2 cursor-pointer hover:bg-slate-700"
+                                key={email.id}
+                                style={{
+                                    fontWeight: email.is_read
+                                        ? "normal"
+                                        : "bold",
+                                }}
+                                onClick={() => {
+                                    const newEmails = emails.map((e) =>
+                                        e.id === email.id
+                                            ? { ...e, is_read: true }
+                                            : e
+                                    )
+                                    setEmails(newEmails)
+                                    setSelectedEmail(email)
+                                    setShowRead(true)
+                                }}>
+                                {!email.is_read && <span className="absolute top-1 right-1" role="img" aria-label="unread">🔵</span>}
+                                <p>
+                                    <u>De :</u> {email.author}
+                                </p>
+                                <p>{email.subject}</p>
+                                <p>
+                                    <u>Date :</u> {email.date}
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                    {selectedEmail && (
+                        <Modal onClose={() => setSelectedEmail(null)}>
+                            <button
+                                className="bg-blue-500 absolute flex hover:bg-blue-700 text-white  h-8 rounded px-3 py-1 top-2 left-2"
+                                onClick={() => handleReply(selectedEmail)}>
+                                ⤵️ Répondre
+                            </button>
+                            <button
+                                className="bg-red-600 absolute flex hover:bg-red-800 text-white w-8 h-8 rounded px-3 py-1 top-2 right-2"
+                                onClick={() => setSelectedEmail(null)}>
+                                X
+                            </button>
+                            <p>
+                                <strong>De :</strong> {selectedEmail.author}
+                            </p>
+                            <p>
+                                <strong>À :</strong>{" "}
+                                {selectedEmail.recipients.join(", ")}
+                            </p>
+                            <h2>{selectedEmail.subject}</h2>
+                            <p>{selectedEmail.body}</p>
+                            <p>
+                                <strong>Date:</strong> {selectedEmail.date}
+                            </p>
+                        </Modal>
+                    )}
+                </div>
+            </div>
             <footer className="fixed w-full border-t-2 border-slate-600 text-center text-slate-100 bottom-0 py-2">
                 Mouad Moubtakir - Imad Saleem
             </footer>

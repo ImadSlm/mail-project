@@ -8,13 +8,13 @@ use dotenv::dotenv;
 use std::env;
 use serde::{Deserialize, Serialize};
 // use std::time::SystemTime;
-// use chrono::{DateTime, Utc};
 use native_tls::TlsConnector; // Added for TLS connection
 // use imap::Session; // Added for IMAP session
 use std::net::TcpStream; // Added for TCP connection
 use mailparse::parse_mail; // Added for parsing email
 use mailparse::MailHeaderMap;
 use imap::Client;
+use chrono::{DateTime, FixedOffset, Local, TimeZone};
 
 #[derive(Deserialize)]
 struct EmailRequest {
@@ -32,12 +32,25 @@ struct Email {
     body: String,
     date: String, // Use chrono DateTime for date
     is_read: bool,
+    in_reply_to: Option<u32>,
 }
 
-// fn system_time_to_date_string(system_time: SystemTime) -> String {
-//     let datetime: DateTime<Utc> = system_time.into();
-//     datetime.to_rfc3339()
-// }
+// Définir une fonction pour formater la date
+fn format_date(date_str: &str) -> String {
+    // Utiliser le fuseau horaire UTC pour analyser la date
+    let utc_time = chrono::offset::Utc::now();
+    let date_time: DateTime<FixedOffset> = DateTime::parse_from_rfc2822(date_str)
+        .unwrap_or_else(|_| FixedOffset::east(0).from_utc_datetime(&utc_time.naive_utc())); // Utiliser le fuseau horaire UTC si le parsing échoue
+
+    // Convertir en fuseau horaire local
+    let local_time: DateTime<Local> = date_time.with_timezone(&Local);
+
+    // Utiliser strftime pour formater la date selon le format désiré
+    let formatted_date = local_time.format("%a, %d %b %Y %H:%M").to_string();
+
+    formatted_date
+}
+
 
 #[get("/get_email_address")]
 async fn get_email_address() -> impl Responder {
@@ -117,7 +130,9 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
             let author: String = parsed.headers.get_first_value("From").unwrap_or_default();
             let subject = parsed.headers.get_first_value("Subject").unwrap_or_default();
             let date = parsed.headers.get_first_value("Date").unwrap_or_default();
+            let formatted_date = format_date(&date); // Formatage de la date
             let body = parsed.get_body().unwrap_or_default();
+            println!("body : {:?}", body);
 
             emails.push(Email {
                 id,
@@ -125,8 +140,9 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
                 recipients: vec![email_address.clone()],
                 subject,
                 body,
-                date,
+                date : formatted_date,
                 is_read: false,
+                in_reply_to: None,
             });
             id += 1;
         }
@@ -146,6 +162,7 @@ async fn get_emails() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // fetch_emails().await.unwrap();
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()
