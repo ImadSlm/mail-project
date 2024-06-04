@@ -1,9 +1,13 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import loader from "./assets/loader.svg"
 import MailForm from "./components/MailForm"
 import Modal from "./components/Modal"
+import Header from "./components/Header"
+import Footer from "./components/Footer"
+import MailBox from "./components/MailBox"
+import Filter from "./components/Filter"
 
 export default function App() {
     const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
@@ -94,18 +98,20 @@ export default function App() {
         fetchEmails()
     }, [])
 
-    const sortedEmails = [...emails].sort((a, b) => {
-        if (sortBy === "date") {
-            return new Date(b.date) - new Date(a.date)
-        } else if (sortBy === "recipient") {
-            return a.recipients[0].localeCompare(b.recipients[0])
-        }
-        return 0
-    })
+    const sortedEmails = useMemo(() => {
+        return[...emails].sort((a, b) => {
+            if (sortBy === "date") {
+                return new Date(b.date) - new Date(a.date)
+            } else if (sortBy === "recipient") {
+                return a.recipients[0].localeCompare(b.recipients[0])
+            }
+            return 0
+        })
+    }, [emails, sortBy]);
 
-    const filteredEmails = showRead
-        ? sortedEmails
-        : sortedEmails.filter((email) => !email.is_read)
+    const filteredEmails = useMemo(() => {
+        return showRead ? sortedEmails : sortedEmails.filter((email) => !email.is_read);
+    }, [sortedEmails, showRead]);
 
     const handleReply = (email) => {
         setRecipients([email.author])
@@ -115,13 +121,10 @@ export default function App() {
     }
 
     return (
-        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-screen">
-            <header className="top-0 text-4xl p-1 fixed font-semibold text-slate-100 mb-10 w-full border-b-2 border-slate-600 text-center">
-                CLIENT MAIL
-            </header>
-
-            <div className="mt-12 p-2 flex">
-                <div className="text-center mr-12">
+        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center sm:h-screen h-full">
+            <Header />
+            <div className="mt-12 p-2 flex flex-col sm:flex-row">
+                <div className="text-center sm:mr-12 mr-0">
                     <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
                         Envoyer un mail
                     </h1>
@@ -166,40 +169,26 @@ export default function App() {
                     )}
                 </div>
 
-                <div className="flex flex-col text-slate-300 ">
+
+                <div className="flex flex-col text-slate-300 mb-10">
                     <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
                         Boite de réception
                     </h1>
-                    <div className="my-2 text-center items-center p-2">
-                        {/* Option to show or hide read emails */}
-                        <label className="mr-8">
-                            <input
-                                className="mr-2"
-                                type="checkbox"
-                                checked={showRead}
-                                onChange={() => setShowRead(!showRead)}
-                            />
-                            Montrer les emails lus
-                        </label>
-                        {/* Option to sort emails by date or recipient */}
-                        <select
-                            className="border-2 border-slate-600 p-1 bg-slate-900 w-48"
-                            onChange={(e) => setSortBy(e.target.value)}
-                            value={sortBy}>
-                            <option value="date">Trier par date</option>
-                            <option value="recipient">
-                                Trier par destinataire
-                            </option>
-                        </select>
-                    </div>
+
+                    <Filter 
+                        showRead={showRead} 
+                        setShowRead={setShowRead}
+                        sortBy={sortBy} 
+                        setSortBy={setSortBy}
+                        />
+                        
                     <ul>
-                        {/* Display filtered and sorted emails */}
                         {(showRead
                             ? filteredEmails
                             : filteredEmails.filter((email) => !email.is_read)
                         ).map((email) => (
                             <li
-                                className="relative my-2 border-2 border-slate-600 p-2 cursor-pointer hover:bg-slate-700"
+                                className={`relative my-2 border-2 ${email.is_read ? "border-slate-600":"border-slate-400"} p-2 cursor-pointer hover:bg-slate-700`}
                                 key={email.id}
                                 style={{
                                     fontWeight: email.is_read
@@ -252,13 +241,25 @@ export default function App() {
                             <p>
                                 <strong>Date:</strong> {selectedEmail.date}
                             </p>
+
                         </Modal>
                     )}
-                </div>
+
+                </div> 
+
+                {/* <MailBox 
+                emails={emails}
+                showRead={showRead}
+                setShowRead={setShowRead}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                filteredEmails={filteredEmails}
+                selectedEmail={selectedEmail}
+                setSelectedEmail={setSelectedEmail}
+                handleReply={handleReply}
+                markAsRead={markAsRead}/> */}
             </div>
-            <footer className="fixed w-full border-t-2 border-slate-600 text-center text-slate-100 bottom-0 py-2">
-                Mouad Moubtakir - Imad Saleem
-            </footer>
+            <Footer />
         </div>
     )
 }

@@ -1,34 +1,7 @@
-// import { createPortal } from 'react-dom';
-// import { useState } from 'react';
-
-// const Modal = ({ children, onClose }) => {
-//     const [show, setShow] = useState(false);
-
-//     const modalContent = (
-//         <div onClick={e => e.stopPropagation}>
-//             {children}
-//         </div>
-//     );
-
-//     const modal = (
-//         <div className="fixed bg-gray-700/75 flex items-center" onClick={onClose}>
-//             {modalContent}
-//         </div>
-//     );
-
-//     return (
-//         <div onClick={() => setShow(!show)}>
-//             {show && createPortal(modal, document.body)}
-//         </div>
-//     );
-// };
-
-// export default Modal;
-
 import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
 
-const Modal = ({ children, onClose }) => {
+export default function Modal({ children, onClose }) {
     useEffect(() => {
         const handleEscape = (event) => {
             if (event.key === 'Escape') {
@@ -49,6 +22,5 @@ const Modal = ({ children, onClose }) => {
         </div>,
         document.body
     );
-};
+}
 
-export default Modal;
