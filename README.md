@@ -11,7 +11,7 @@ npm start
  terminal :
  
  ```console
-cd backend
+cd mail_client
 cargo run
 cd ../frontend
 npm run dev
