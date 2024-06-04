@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import loader from "./assets/loader.svg"
 import MailForm from "./components/MailForm"
-import createPortal from "react-dom"
 import Modal from "./components/Modal"
 
 export default function App() {
@@ -39,6 +38,14 @@ export default function App() {
             } else {
                 setError(`Erreur : ${error.message}`)
             }
+        }
+    }
+
+    const markAsRead = async (id) => {
+        try {
+            await axios.post(`http://localhost:8080/mark_as_read/${id}`);
+        } catch (error) {
+            console.error(`Failed to mark email as read: ${error}`);
         }
     }
 
@@ -207,6 +214,7 @@ export default function App() {
                                     )
                                     setEmails(newEmails)
                                     setSelectedEmail(email)
+                                    markAsRead(email.id)
                                     setShowRead(true)
                                 }}>
                                 {!email.is_read && <span className="absolute top-1 right-1" role="img" aria-label="unread">🔵</span>}

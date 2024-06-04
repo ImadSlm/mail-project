@@ -15,6 +15,16 @@ use mailparse::parse_mail; // Added for parsing email
 use mailparse::MailHeaderMap;
 use imap::Client;
 use chrono::{DateTime, FixedOffset, Local, TimeZone};
+use std::sync::Mutex;
+use std::collections::HashSet;
+
+#[macro_use]
+extern crate lazy_static;
+
+
+lazy_static! {
+    static ref READ_EMAILS: Mutex<HashSet<u32>> = Mutex::new(HashSet::new());
+}
 
 #[derive(Deserialize)]
 struct EmailRequest {
@@ -132,7 +142,7 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
             let date = parsed.headers.get_first_value("Date").unwrap_or_default();
             let formatted_date = format_date(&date); // Formatage de la date
             let body = parsed.get_body().unwrap_or_default();
-            println!("body : {:?}", body);
+            // println!("body : {:?}", body);
 
             emails.push(Email {
                 id,
@@ -141,7 +151,7 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
                 subject,
                 body,
                 date : formatted_date,
-                is_read: false,
+                is_read: READ_EMAILS.lock().unwrap().contains(&id),
                 in_reply_to: None,
             });
             id += 1;
@@ -160,6 +170,13 @@ async fn get_emails() -> impl Responder {
     }
 }
 
+#[post("/mark_as_read/{id}")]
+async fn mark_as_read(id: web::Path<u32>) -> impl Responder {
+    let id = id.into_inner();
+    READ_EMAILS.lock().unwrap().insert(id);
+    HttpResponse::Ok().body("Email marked as read")
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // fetch_emails().await.unwrap();
@@ -175,6 +192,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_email_address)
             //.service(get_mail)
             .service(get_emails)
+            .service(mark_as_read)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
