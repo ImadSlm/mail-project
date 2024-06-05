@@ -3,11 +3,11 @@ import { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import loader from "./assets/loader.svg"
 import MailForm from "./components/MailForm"
-import Modal from "./components/Modal"
 import Header from "./components/Header"
 import Footer from "./components/Footer"
 import MailBox from "./components/MailBox"
-import Filter from "./components/Filter"
+// import Modal from "./components/Modal"
+// import Filter from "./components/Filter"
 
 export default function App() {
     const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
@@ -124,7 +124,7 @@ export default function App() {
         <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center sm:h-screen h-full">
             <Header />
             <div className="mt-12 p-2 flex flex-col sm:flex-row">
-                <div className="text-center sm:mr-12 mr-0">
+                {/* <div className="text-center sm:mr-12 mr-0">
                     <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
                         Envoyer un mail
                     </h1>
@@ -139,7 +139,7 @@ export default function App() {
                         ) : (
                             `Connecté en tant que ${emailAddress}`
                         )}
-                    </p>
+                    </p> */}
 
                     <MailForm
                         recipients={recipients}
@@ -149,16 +149,22 @@ export default function App() {
                         message={message}
                         setMessage={setMessage}
                         handleSubmit={handleSubmit}
+                        showEvent={showEvent}
+                        response={response}
+                        error={error}
+                        loading={loading}
+                        emailAddress={emailAddress}
+                        loader={loader}
                     />
 
-                    {mailData && (
+                    {/* {mailData && (
                         <div className="mt-4 text-white">
                             <h6 className="text-2xl">Mail reçu:</h6>
                             <p>{mailData}</p>
                         </div>
-                    )}
+                    )} */}
 
-                    {showEvent && (
+                    {/* {showEvent && (
                         <p className="text-xl text-white">{response}</p>
                     )}
 
@@ -167,97 +173,23 @@ export default function App() {
                             {error}
                         </p>
                     )}
-                </div>
+                </div> */}
 
 
-                <div className="flex flex-col text-slate-300 mb-10">
-                    <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
-                        Boite de réception
-                    </h1>
+                <MailBox 
+                    emails={emails}
+                    setEmails={setEmails}
+                    showRead={showRead}
+                    setShowRead={setShowRead}
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    filteredEmails={filteredEmails}
+                    selectedEmail={selectedEmail}
+                    setSelectedEmail={setSelectedEmail}
+                    handleReply={handleReply}
+                    markAsRead={markAsRead}
+                />
 
-                    <Filter 
-                        showRead={showRead} 
-                        setShowRead={setShowRead}
-                        sortBy={sortBy} 
-                        setSortBy={setSortBy}
-                        />
-                        
-                    <ul>
-                        {(showRead
-                            ? filteredEmails
-                            : filteredEmails.filter((email) => !email.is_read)
-                        ).map((email) => (
-                            <li
-                                className={`relative my-2 border-2 ${email.is_read ? "border-slate-600":"border-slate-400"} p-2 cursor-pointer hover:bg-slate-700`}
-                                key={email.id}
-                                style={{
-                                    fontWeight: email.is_read
-                                        ? "normal"
-                                        : "bold",
-                                }}
-                                onClick={() => {
-                                    const newEmails = emails.map((e) =>
-                                        e.id === email.id
-                                            ? { ...e, is_read: true }
-                                            : e
-                                    )
-                                    setEmails(newEmails)
-                                    setSelectedEmail(email)
-                                    markAsRead(email.id)
-                                    setShowRead(true)
-                                }}>
-                                {!email.is_read && <span className="absolute top-1 right-1" role="img" aria-label="unread">🔵</span>}
-                                <p>
-                                    <u>De :</u> {email.author}
-                                </p>
-                                <p>{email.subject}</p>
-                                <p>
-                                    <u>Date :</u> {email.date}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                    {selectedEmail && (
-                        <Modal onClose={() => setSelectedEmail(null)}>
-                            <button
-                                className="bg-blue-500 absolute flex hover:bg-blue-700 text-white  h-8 rounded px-3 py-1 top-2 left-2"
-                                onClick={() => handleReply(selectedEmail)}>
-                                ⤵️ Répondre
-                            </button>
-                            <button
-                                className="bg-red-600 absolute flex hover:bg-red-800 text-white w-8 h-8 rounded px-3 py-1 top-2 right-2"
-                                onClick={() => setSelectedEmail(null)}>
-                                X
-                            </button>
-                            <p>
-                                <strong>De :</strong> {selectedEmail.author}
-                            </p>
-                            <p>
-                                <strong>À :</strong>{" "}
-                                {selectedEmail.recipients.join(", ")}
-                            </p>
-                            <h2>{selectedEmail.subject}</h2>
-                            <p>{selectedEmail.body}</p>
-                            <p>
-                                <strong>Date:</strong> {selectedEmail.date}
-                            </p>
-
-                        </Modal>
-                    )}
-
-                </div> 
-
-                {/* <MailBox 
-                emails={emails}
-                showRead={showRead}
-                setShowRead={setShowRead}
-                sortBy={sortBy}
-                setSortBy={setSortBy}
-                filteredEmails={filteredEmails}
-                selectedEmail={selectedEmail}
-                setSelectedEmail={setSelectedEmail}
-                handleReply={handleReply}
-                markAsRead={markAsRead}/> */}
             </div>
             <Footer />
         </div>

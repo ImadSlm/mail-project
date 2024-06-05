@@ -1,8 +1,10 @@
 import Modal from "./Modal"
 import { useMemo } from "react"
+import Filter from "./Filter"
 
-export default function MailBox(
+export default function MailBox({
     emails,
+    setEmails,
     showRead,
     setShowRead,
     sortBy,
@@ -11,10 +13,21 @@ export default function MailBox(
     selectedEmail,
     setSelectedEmail,
     handleReply,
-    markAsRead
-) {
+    markAsRead,
+}) {
     return (
-        <>
+        <div className="flex flex-col text-slate-300 mb-10">
+            <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
+                Boite de réception
+            </h1>
+
+            <Filter
+                showRead={showRead}
+                setShowRead={setShowRead}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+            />
+
             <ul>
                 {(showRead
                     ? filteredEmails
@@ -83,6 +96,6 @@ export default function MailBox(
                     </p>
                 </Modal>
             )}
-        </>
+        </div>
     )
 }
