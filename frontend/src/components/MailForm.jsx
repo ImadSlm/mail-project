@@ -56,9 +56,7 @@ export default function MailForm({
                         }
                         onChange={(e) =>
                             setRecipients(
-                                e.target.value
-                                    .split(",")
-                                    .map((email) => email.trim())
+                                setSelectedRecipients(e.target.value.split(",").map((email) => email.trim()))
                             )
                         }
                         placeholder="Séparer les adresses par une virgule"
@@ -71,7 +69,7 @@ export default function MailForm({
                         className="border-2 border-slate-500 p-1 bg-slate-900 w-96"
                         type="text"
                         value={subject}
-                        onChange={(e) => setSubject(e.target.value)}
+                        onChange={(e) => setSubject(setSelectedSubject(e.target.value))}
                         required
                     />
                 </div>
@@ -80,7 +78,7 @@ export default function MailForm({
                     <textarea
                         className="border-2 border-slate-500 p-1 bg-slate-900 h-32 w-96"
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={(e) => setMessage(setSelectedMessage(e.target.value))}
                         required
                     />
                 </div>
