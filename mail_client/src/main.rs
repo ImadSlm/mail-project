@@ -33,6 +33,7 @@ struct EmailRequest {
     subject: String,
     message: String,
     in_reply_to: Option<u32>,
+    cc: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)] // Add Serialize and Deserialize to Email struct
@@ -91,6 +92,10 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
 
     if let Some(in_reply_to) = req.in_reply_to {
         email_builder = email_builder.header(InReplyTo::from(in_reply_to.to_string()));    
+    }
+    
+    for cc_recipient in &req.cc { // Ajout des destinataires en copie carbone (CC)
+        email_builder = email_builder.cc(cc_recipient.parse().expect("Invalid CC address"));
     }
     
     let email = email_builder

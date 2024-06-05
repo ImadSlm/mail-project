@@ -7,6 +7,8 @@ export default function MailForm({
     subject : initialSubject,
     setSubject,
     message : initialMessage,
+    ccRecipients: initialCcRecipients,
+    setCcRecipients,
     setMessage,
     showEvent,
     response,
@@ -20,6 +22,9 @@ export default function MailForm({
     const [recipients, setSelectedRecipients] = useState(initialRecipients);
     const [subject, setSelectedSubject] = useState(initialSubject);
     const [message, setSelectedMessage] = useState(initialMessage);
+    const [ccRecipients, updateCcRecipients] = useState(initialCcRecipients); // Nouvel état pour les destinataires CC
+    const [showCcInput, setShowCcInput] = useState(false); // Nouvel état pour suivre si la case à cocher est cochée ou non
+
 
     useEffect(() => {
         if (selectedEmail) {
@@ -43,7 +48,7 @@ export default function MailForm({
             </p>
             <form
                 onSubmit={(e) => handleSubmit(e)}
-                className="justify-center border text-slate-100 border-slate-600 border-rounded px-6 py-6">
+                className="justify-center border text-slate-100 border-slate-600 border-rounded px-6 py-6 my-3">
                 <div className="form-element">
                     <label className="mt-2 mb-1">Destinataire(s) :</label>
                     <input
@@ -54,13 +59,51 @@ export default function MailForm({
                                 ? recipients.join(",")
                                 : ""
                         }
-                        onChange={(e) =>
-                            setSelectedRecipients(e.target.value.split(",").map((email) => email.trim())) 
+                        // onChange={(e) =>{
+                        //     // console.log(e.target.value);
+                        //     setSelectedRecipients(e.target.value.split(",").map((email) => email.trim()))
+                        // }}
+                        onChange={(e) =>{
+                            const updatedRecipients = e.target.value.split(",").map((email) => email.trim());
+                            setSelectedRecipients(updatedRecipients);
+                            setRecipients(updatedRecipients);
+                            }
                         }
                         placeholder="Séparer les adresses par une virgule"
                         required
                     />
                 </div>
+
+                <div className="form-element">
+                    <div className="form-element" style={{ display: showCcInput ? 'block' : 'none' }}>
+                        {/* <label className="mt-2 mb-1">Cc : </label> */}
+                        <input
+                            className="border-2 border-slate-500 p-1 bg-slate-900 w-96 mt-1"
+                            type="text"
+                            value={
+                                Array.isArray(ccRecipients)
+                                ? ccRecipients.join(",")
+                                : ""
+                            }
+                            onChange={(e) =>{
+                                const updateCc = e.target.value.split(",").map((email) => email.trim());
+                                updateCcRecipients(updateCc)
+                                setCcRecipients(updateCc)
+                            }}
+                            placeholder="Cc - Séparer les adresses par une virgule"
+                            />
+                    </div>
+                    
+                    <label>
+                        Cc
+                        <input
+                            className="ml-2 cursor-pointer rounded"
+                            type="checkbox"
+                            onChange={() => setShowCcInput(!showCcInput)} // Inverse l'état de showCcInput lorsqu'on coche/décoche la case
+                        />
+                    </label>
+                </div>
+
                 <div className="form-element">
                     <label className="mt-2 mb-1">Objet :</label>
                     <input
@@ -71,6 +114,7 @@ export default function MailForm({
                         required
                     />
                 </div>
+
                 <div className="form-element">
                     <label className="mt-2 mb-1">Message :</label>
                     <textarea
@@ -80,6 +124,7 @@ export default function MailForm({
                         required
                     />
                 </div>
+
                 <button
                     className="border-rounded border-slate-400 text-slate-200 bg-blue-600 hover:bg-blue-700 mx-auto mt-5 px-2 py-0"
                     type="submit">

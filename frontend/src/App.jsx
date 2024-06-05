@@ -11,6 +11,7 @@ import MailBox from "./components/MailBox"
 
 export default function App() {
     const [recipients, setRecipients] = useState(["saleem@et.esiea.fr"])
+    const [ccRecipients, setCcRecipients] = useState([])
     const [subject, setSubject] = useState("sujet test")
     const [message, setMessage] = useState("msg test")
     const [response, setResponse] = useState("")
@@ -29,6 +30,7 @@ export default function App() {
         subject,
         message,
         in_reply_to: selectedEmail ? selectedEmail.id : null,
+        ccRecipients,
     });
 
     const handleSubmit = async (e) => {
@@ -40,6 +42,7 @@ export default function App() {
                 subject,
                 message,
                 in_reply_to: selectedEmail ? selectedEmail.id : null,
+                cc: ccRecipients,
             })
             console.log(res)
             setResponse(res.data)
@@ -143,7 +146,7 @@ export default function App() {
                 subject: replySubject,
                 message: replyBody,
                 in_reply_to: inReplyTo, // Ajout de cette ligne
-                // cc: [], // Ajoutez les adresses email en copie ici, si nécessaire
+                cc: ccRecipients, // Ajoutez les adresses email en copie ici, si nécessaire
             })
             .then((response) => {
                 console.log(response.data);
@@ -172,6 +175,8 @@ export default function App() {
                     emailAddress={emailAddress}
                     loader={loader}
                     selectedEmail={selectedEmail}
+                    ccRecipients={ccRecipients}
+                    setCcRecipients={setCcRecipients}
                 />
                 <MailBox
                     emails={emails}

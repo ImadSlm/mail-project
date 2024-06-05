@@ -24,7 +24,7 @@ export default function MailBox({
     const [replyText, setReplyText] = useState(selectedEmail ? `\n\n----\n${selectedEmail.body}` : ''); // Nouveau state pour stocker le texte de réponse
 
     return (
-        <div className="flex flex-col text-slate-300 mb-10">
+        <div className="flex flex-col text-slate-300 mb-32">
             <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
                 Boite de réception
             </h1>
@@ -140,6 +140,7 @@ export default function MailBox({
                     </p>
                 </Modal>
             )}
+            <p className="text-slate-400 text-center mt-6">- Il n'y a pas d'autres mails 📩-</p>
         </div>
     )
 }
