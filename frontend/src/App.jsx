@@ -24,6 +24,13 @@ export default function App() {
     const [sortBy, setSortBy] = useState("date")
     const [selectedEmail, setSelectedEmail] = useState(null)
 
+    console.log({
+        recipients,
+        subject,
+        message,
+        in_reply_to: selectedEmail ? selectedEmail.id : null,
+    });
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
