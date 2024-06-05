@@ -1,10 +1,12 @@
+import { useState, useEffect } from "react";
+
 export default function MailForm({
     handleSubmit,
-    recipients,
+    recipients : initialRecipients,
     setRecipients,
-    subject,
+    subject : initialSubject,
     setSubject,
-    message,
+    message : initialMessage,
     setMessage,
     showEvent,
     response,
@@ -12,7 +14,21 @@ export default function MailForm({
     loading,
     emailAddress,
     loader,
+    selectedEmail
 }) {
+
+    const [recipients, setSelectedRecipients] = useState(initialRecipients);
+    const [subject, setSelectedSubject] = useState(initialSubject);
+    const [message, setSelectedMessage] = useState(initialMessage);
+
+    useEffect(() => {
+        if (selectedEmail) {
+            setRecipients([selectedEmail.author]); // Utilisez l'auteur du mail comme destinataire par défaut
+            setSubject(`Re: ${selectedEmail.subject}`); // Ajoutez "Re: " au sujet du mail original
+            setMessage(`\n\nLe ${selectedEmail.date}, ${selectedEmail.author} a écrit :\n${selectedEmail.body}`); // Préremplissez le message avec le corps du mail original
+        }
+    }, [selectedEmail, setRecipients, setSubject, setMessage]);
+
     return (
         <div className="text-center sm:mr-12 mr-0">
             <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
@@ -74,7 +90,7 @@ export default function MailForm({
                     Envoyer
                 </button>
             </form>
-            
+
             {showEvent && <p className="text-xl text-white">{response}</p>}
 
             {error && (

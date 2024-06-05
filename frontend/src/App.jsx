@@ -47,9 +47,9 @@ export default function App() {
 
     const markAsRead = async (id) => {
         try {
-            await axios.post(`http://localhost:8080/mark_as_read/${id}`);
+            await axios.post(`http://localhost:8080/mark_as_read/${id}`)
         } catch (error) {
-            console.error(`Failed to mark email as read: ${error}`);
+            console.error(`Failed to mark email as read: ${error}`)
         }
     }
 
@@ -99,7 +99,7 @@ export default function App() {
     }, [])
 
     const sortedEmails = useMemo(() => {
-        return[...emails].sort((a, b) => {
+        return [...emails].sort((a, b) => {
             if (sortBy === "date") {
                 return new Date(b.date) - new Date(a.date)
             } else if (sortBy === "recipient") {
@@ -107,76 +107,66 @@ export default function App() {
             }
             return 0
         })
-    }, [emails, sortBy]);
+    }, [emails, sortBy])
 
     const filteredEmails = useMemo(() => {
-        return showRead ? sortedEmails : sortedEmails.filter((email) => !email.is_read);
-    }, [sortedEmails, showRead]);
+        return showRead
+            ? sortedEmails
+            : sortedEmails.filter((email) => !email.is_read)
+    }, [sortedEmails, showRead])
 
-    const handleReply = (email) => {
-        setRecipients([email.author])
-        setSubject(`RE: ${email.subject}`)
-        setMessage(`\n\n----\n${email.body}`)
-        setSelectedEmail(null)
+    // const handleReply = (email) => {
+    //     setRecipients([email.author])
+    //     setSubject(`RE: ${email.subject}`)
+    //     setMessage(`\n\n----\n${email.body}`)
+    //     setSelectedEmail(null)
+    // }
+
+    function handleReply(selectedEmail) {
+        const replySubject = `Re: ${selectedEmail.subject}`
+        const replyBody = `\n\nLe ${selectedEmail.date}, ${selectedEmail.author} Msg:\n${selectedEmail.body}`
+        const inReplyTo = selectedEmail.id
+
+        const ccRecipients = []
+
+        // Appel API pour envoyer le mail
+        axios
+            .post("http://localhost:8080/send_email", {
+                recipients: [selectedEmail.author],
+                subject: replySubject,
+                message: replyBody,
+                in_reply_to: inReplyTo, // Ajout de cette ligne
+                // cc: [], // Ajoutez les adresses email en copie ici, si nécessaire
+            })
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     }
 
     return (
         <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center sm:h-screen h-full">
             <Header />
             <div className="mt-12 p-2 flex flex-col sm:flex-row">
-                {/* <div className="text-center sm:mr-12 mr-0">
-                    <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
-                        Envoyer un mail
-                    </h1>
-
-                    <p className="text-slate-400 py-5 ml-4 ">
-                        {loading || !emailAddress ? (
-                            <img
-                                src={loader}
-                                className="mx-auto"
-                                alt="Loading..."
-                            />
-                        ) : (
-                            `Connecté en tant que ${emailAddress}`
-                        )}
-                    </p> */}
-
-                    <MailForm
-                        recipients={recipients}
-                        setRecipients={setRecipients}
-                        subject={subject}
-                        setSubject={setSubject}
-                        message={message}
-                        setMessage={setMessage}
-                        handleSubmit={handleSubmit}
-                        showEvent={showEvent}
-                        response={response}
-                        error={error}
-                        loading={loading}
-                        emailAddress={emailAddress}
-                        loader={loader}
-                    />
-
-                    {/* {mailData && (
-                        <div className="mt-4 text-white">
-                            <h6 className="text-2xl">Mail reçu:</h6>
-                            <p>{mailData}</p>
-                        </div>
-                    )} */}
-
-                    {/* {showEvent && (
-                        <p className="text-xl text-white">{response}</p>
-                    )}
-
-                    {error && (
-                        <p className="text-red-500 text-center text-xl font-medium">
-                            {error}
-                        </p>
-                    )}
-                </div> */}
-
-
-                <MailBox 
+                <MailForm
+                    recipients={recipients}
+                    setRecipients={setRecipients}
+                    subject={subject}
+                    setSubject={setSubject}
+                    message={message}
+                    setMessage={setMessage}
+                    handleSubmit={handleSubmit}
+                    showEvent={showEvent}
+                    response={response}
+                    error={error}
+                    loading={loading}
+                    emailAddress={emailAddress}
+                    loader={loader}
+                    selectedEmail={selectedEmail}
+                />
+                <MailBox
                     emails={emails}
                     setEmails={setEmails}
                     showRead={showRead}
@@ -188,8 +178,9 @@ export default function App() {
                     setSelectedEmail={setSelectedEmail}
                     handleReply={handleReply}
                     markAsRead={markAsRead}
+                    showEvent={showEvent}
+                    response={response}
                 />
-
             </div>
             <Footer />
         </div>

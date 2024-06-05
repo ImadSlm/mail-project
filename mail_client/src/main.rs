@@ -4,6 +4,7 @@ use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use lettre::transport::smtp::client::Tls;
 use lettre::transport::smtp::client::TlsParameters;
+use lettre::message::header::InReplyTo;
 use dotenv::dotenv;
 use std::env;
 use serde::{Deserialize, Serialize};
@@ -31,6 +32,7 @@ struct EmailRequest {
     recipients: Vec<String>,
     subject: String,
     message: String,
+    in_reply_to: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize)] // Add Serialize and Deserialize to Email struct
@@ -87,6 +89,10 @@ async fn send_email(req: web::Json<EmailRequest>) -> impl Responder {
         email_builder = email_builder.to(recipient.parse().expect("Invalid to address"));
     }
 
+    if let Some(in_reply_to) = req.in_reply_to {
+        email_builder = email_builder.header(InReplyTo::from(in_reply_to.to_string()));    
+    }
+    
     let email = email_builder
         .body(req.message.clone())
         .expect("Failed to build email");
