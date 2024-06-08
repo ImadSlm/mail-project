@@ -1,5 +1,6 @@
 # Ignore Rust build directory
 mail_client/target
+mail_client/.env
 
 # Ignore node_modules for frontend
 frontend/node_modules

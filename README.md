@@ -17,4 +17,11 @@ cd ../frontend
 npm run dev
 ```
 
+créer un fichier .env dans mail-project/mail_client avec :
+
+```console
+EMAIL_ADDRESS=*adresse mail*
+EMAIL_PASSWORD=*mdp*
+```
+
 Par : Mouad Moubtakir - Imad Saleem
