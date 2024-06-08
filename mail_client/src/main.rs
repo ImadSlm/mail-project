@@ -64,6 +64,21 @@ fn format_date(date_str: &str) -> String {
     formatted_date
 }
 
+fn extract_text_body(parsed: &mailparse::ParsedMail) -> String {
+    if parsed.subparts.is_empty() {
+        parsed.get_body().unwrap_or_default()
+    } else {
+        parsed.subparts.iter()
+            .filter(|part| {
+                part.get_headers().get_first_value("Content-Type")
+                    .map(|content_type| content_type.starts_with("text/plain"))
+                    .unwrap_or(false)
+            })
+            .map(|part| part.get_body().unwrap_or_default())
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+}
 
 #[get("/get_email_address")]
 async fn get_email_address() -> impl Responder {
@@ -152,8 +167,10 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
             let subject = parsed.headers.get_first_value("Subject").unwrap_or_default();
             let date = parsed.headers.get_first_value("Date").unwrap_or_default();
             let formatted_date = format_date(&date); // Formatage de la date
-            let body = parsed.get_body().unwrap_or_default();
-            // println!("body : {:?}", body);
+            let body = extract_text_body(&parsed);
+            println!("body : {:?}", body);
+            
+            
 
             emails.push(Email {
                 id,

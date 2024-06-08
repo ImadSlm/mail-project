@@ -22,7 +22,7 @@ export default function MailBox({
 
     const [replyReady, setReplyReady] = useState(false) // Nouveau state pour gérer la préparation de la réponse
     const [replyText, setReplyText] = useState(selectedEmail ? `\n\n----\n${selectedEmail.body}` : ''); // Nouveau state pour stocker le texte de réponse
-
+    console.log(replyText);
     return (
         <div className="flex flex-col text-slate-300 mb-32">
             <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
@@ -133,14 +133,14 @@ export default function MailBox({
                         <strong>À :</strong>{" "}
                         {selectedEmail.recipients.join(", ")}
                     </p>
-                    <h2>{selectedEmail.subject}</h2>
-                    <p>{selectedEmail.body}</p>
-                    <p>
+                    <h2 className="underline font-medium"><strong>Objet : </strong>{selectedEmail.subject}</h2>
+                    <p className="px-1 mt-1 border-l-2 border-slate-600">{selectedEmail.body}</p>
+                    <p className="mt-2">
                         <strong>Date:</strong> {selectedEmail.date}
                     </p>
                 </Modal>
             )}
-            <p className="text-slate-400 text-center mt-6">- Il n'y a pas d'autres mails 📩-</p>
+            <p className="text-slate-400 text-center mt-6">- Il n'y a pas d'autres mails 📩 -</p>
         </div>
     )
 }
