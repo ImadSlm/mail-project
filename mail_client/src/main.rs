@@ -168,7 +168,7 @@ async fn fetch_emails() -> Result<Vec<Email>, Box<dyn std::error::Error>> {
             let date = parsed.headers.get_first_value("Date").unwrap_or_default();
             let formatted_date = format_date(&date); // Formatage de la date
             let body = extract_text_body(&parsed);
-            println!("body : {:?}", body);
+            // println!("body : {:?}", body);
             
             
 

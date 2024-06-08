@@ -25,13 +25,13 @@ export default function App() {
     const [sortBy, setSortBy] = useState("date")
     const [selectedEmail, setSelectedEmail] = useState(null)
 
-    console.log({
-        recipients,
-        subject,
-        message,
-        in_reply_to: selectedEmail ? selectedEmail.id : null,
-        ccRecipients,
-    });
+    // console.log({
+    //     recipients,
+    //     subject,
+    //     message,
+    //     in_reply_to: selectedEmail ? selectedEmail.id : null,
+    //     ccRecipients,
+    // });
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -113,7 +113,10 @@ export default function App() {
             if (sortBy === "date") {
                 return new Date(b.date) - new Date(a.date)
             } else if (sortBy === "recipient") {
-                return a.recipients[0].localeCompare(b.recipients[0])
+                // return [...emails].sort((a, b) => a.recipient.localeCompare(b.recipient));
+                if (a.author < b.author) {
+                    return -1
+                }
             }
             return 0
         })
@@ -157,9 +160,9 @@ export default function App() {
     }
 
     return (
-        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-full">
+        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-full :h-screen">
             <Header />
-            <div className="mt-12 p-2 flex flex-col sm:flex-row">
+            <div className="mt-12 p-2 flex px-4 flex-col sm:flex-row">
                 <MailForm
                     recipients={recipients}
                     setRecipients={setRecipients}

@@ -43,7 +43,7 @@ useEffect(() => {
                 setSortBy={setSortBy}
             />
 
-            <ul>
+            <ul className="z-0">
                 {(showRead
                     ? filteredEmails
                     : filteredEmails.filter((email) => !email.is_read)
@@ -53,7 +53,7 @@ useEffect(() => {
                             email.is_read
                                 ? "border-slate-600"
                                 : "border-slate-400"
-                        } p-2 cursor-pointer hover:bg-slate-700`}
+                        } p-3 cursor-pointer hover:bg-slate-700`}
                         key={email.id}
                         style={{
                             fontWeight: email.is_read ? "normal" : "bold",
@@ -76,11 +76,11 @@ useEffect(() => {
                             </span>
                         )}
                         <p>
-                            <u>De :</u> {email.author}
+                            <span className="underline underline-offset-2">De</span> : {email.author}
                         </p>
                         <p>{email.subject}</p>
-                        <p>
-                            <u>Date :</u> {email.date}
+                        <p className="absolute bottom-1 right-1 p-1">
+                            <span className="underline underline-offset-2">Date</span> : {email.date}
                         </p>
                     </li>
                 ))}
@@ -140,7 +140,7 @@ useEffect(() => {
                         <strong>À :</strong>{" "}
                         {selectedEmail.recipients.join(", ")}
                     </p>
-                    <h2 className="underline font-medium"><strong>Objet : </strong>{selectedEmail.subject}</h2>
+                    <h2 className="underline underline-offset-2 font-medium"><strong>Objet : </strong>{selectedEmail.subject}</h2>
                     <p className="px-1 mt-1 border-l-2 border-slate-600">{selectedEmail.body}</p>
                     <p className="mt-2">
                         <strong>Date:</strong> {selectedEmail.date}
