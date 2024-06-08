@@ -126,7 +126,7 @@ export default function MailForm({
                 </div>
 
                 <button
-                    className="border-rounded border-slate-400 text-slate-200 bg-blue-600 hover:bg-blue-700 mx-auto mt-5 px-2 py-0"
+                    className="rounded border-rounded border-slate-400 text-slate-200 bg-blue-600 hover:bg-blue-700 mx-auto mt-5 px-2 py-0.5"
                     type="submit">
                     Envoyer
                 </button>

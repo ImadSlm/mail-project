@@ -2,6 +2,7 @@ import Modal from "./Modal"
 import { useMemo } from "react"
 import Filter from "./Filter"
 import { useState } from "react"
+import { useEffect } from "react";
 
 export default function MailBox({
     emails,
@@ -21,8 +22,14 @@ export default function MailBox({
 }) {
 
     const [replyReady, setReplyReady] = useState(false) // Nouveau state pour gérer la préparation de la réponse
-    const [replyText, setReplyText] = useState(selectedEmail ? `\n\n----\n${selectedEmail.body}` : ''); // Nouveau state pour stocker le texte de réponse
-    console.log(replyText);
+    const [replyText, setReplyText] = useState(''); // Nouveau state pour stocker le texte de réponse
+
+useEffect(() => {
+    if (selectedEmail) {
+        setReplyText(`\n\n----\n${selectedEmail.body}`);
+    }
+}, [selectedEmail]);
+
     return (
         <div className="flex flex-col text-slate-300 mb-32">
             <h1 className="text-2xl font-semibold text-center border-b-2 pb-2 text-white">
@@ -84,7 +91,7 @@ export default function MailBox({
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault()
-                                handleReply(selectedEmail) // Envoyer la réponse lorsque le formulaire est soumis
+                                handleReply(selectedEmail, replyText) // Envoyer la réponse lorsque le formulaire est soumis
                                 setSelectedEmail(null) // Fermer le modal après l'envoi
                             }}>
                             <label className="mt-2 mb-1">À :</label>
@@ -109,7 +116,7 @@ export default function MailBox({
                                 }}
                             />
                             <button
-                                className="border-rounded border-slate-400 text-slate-200 bg-blue-600 hover:bg-blue-700 mx-auto mt-2 mb-6 px-2 py-0"
+                                className="flex items-center rounded border-rounded border-slate-400 text-slate-200 bg-blue-600 hover:bg-blue-700 mx-auto mt-2 mb-6 px-2 py-0.5"
                                 type="submit">
                                 Envoyer
                             </button>
@@ -118,7 +125,7 @@ export default function MailBox({
                     {showEvent && <p className="text-xl text-white">{response}</p>}
                     <button
                         className="bg-blue-500 absolute flex hover:bg-blue-700 text-white  h-8 rounded px-3 py-1 top-2 left-2"
-                        onClick={() => (!replyReady ? setReplyReady(selectedEmail) : setReplyReady(false))}>
+                        onClick={() => (setReplyReady(!replyReady))}>
                         ⤵️ Répondre
                     </button>
                     <button
@@ -140,7 +147,7 @@ export default function MailBox({
                     </p>
                 </Modal>
             )}
-            <p className="text-slate-400 text-center mt-6">- Il n'y a pas d'autres mails 📩 -</p>
+            <p className="text-slate-400 text-center mt-6">- {filteredEmails.length} mails - Il n'y a pas d'autres mails 📩 -</p>
         </div>
     )
 }

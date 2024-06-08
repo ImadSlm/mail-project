@@ -132,9 +132,9 @@ export default function App() {
     //     setSelectedEmail(null)
     // }
 
-    function handleReply(selectedEmail) {
+    function handleReply(selectedEmail, replyText) {
         const replySubject = `Re: ${selectedEmail.subject}`
-        const replyBody = `\n\nLe ${selectedEmail.date}, ${selectedEmail.author} Msg:\n${selectedEmail.body}`
+        const replyBody = `${replyText}\n\n----\nLe ${selectedEmail.date}, ${selectedEmail.author} Msg:\n${selectedEmail.body}`
         const inReplyTo = selectedEmail.id
 
         const ccRecipients = []
@@ -157,7 +157,7 @@ export default function App() {
     }
 
     return (
-        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center sm:h-screen h-full">
+        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-full">
             <Header />
             <div className="mt-12 p-2 flex flex-col sm:flex-row">
                 <MailForm
