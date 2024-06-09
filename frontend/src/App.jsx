@@ -160,7 +160,7 @@ export default function App() {
     }
 
     return (
-        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-full :h-screen">
+        <div className="bg-gradient-to-b from-slate-800 to-black flex justify-center h-full sm:h-screen">
             <Header />
             <div className="mt-12 p-2 flex px-4 flex-col sm:flex-row">
                 <MailForm
