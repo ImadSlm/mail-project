@@ -93,6 +93,7 @@ mail-project/
 │   ├── package.json
 │   └── ...
 │
+├── captures/
 ├── README.md           
 └── .gitignore
  ```
@@ -100,6 +101,17 @@ mail-project/
 
 
 ## Captures
+##### Affichage du client :  
 
+![alt text](https://github.com/ImadSlm/mail-project/blob/main/captures/cap1.png "Client mail")  
+
+##### Formulaire d'envoi de mail avec l'exemple de mail reçu :  
+
+![alt text](https://github.com/ImadSlm/mail-project/blob/main/captures/cap2.png "Formulaire de mail")  
+![alt text](https://github.com/ImadSlm/mail-project/blob/main/captures/cap3.png "Exemple de mail")  
+
+##### Mail consulté depuis le boîte de réception :  
+
+![alt text](https://github.com/ImadSlm/mail-project/blob/main/captures/cap4.png "Mail consulté via la boîte de réception")  
 
 #### Par : Mouad Moubtakir - Imad Saleem
